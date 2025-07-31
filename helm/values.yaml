@@ -5,7 +5,7 @@ namespace: omar-elnemr-helm-ns
 replicaCount: 3
 
 image:
-  repository: your-acr.azurecr.io/flask-app
+  repository: acr.azurecr.io/flask-app
   tag: latest
   pullPolicy: IfNotPresent
 

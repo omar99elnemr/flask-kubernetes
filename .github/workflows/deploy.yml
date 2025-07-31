@@ -71,8 +71,7 @@ jobs:
               --namespace omar-elnemr-helm-ns \
               --set image.repository=${{ vars.ACR_LOGIN_SERVER }}/omar-elnemr-flask-app \
               --set image.tag=${{ github.sha }} \
-              --wait \
-              --timeout=300s
+              --wait
               
     - name: Show Kubernetes resources
       run: |       
