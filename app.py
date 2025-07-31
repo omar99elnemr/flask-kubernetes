@@ -25,6 +25,10 @@ def index():
         
     return render_template('index.html', tasks=tasks)
 
+@app.route('/health')
+def health_check():
+    return {'status': 'healthy', 'message': 'Omar ElNemr Flask App is running!'}, 200
+
 if __name__ == '__main__':
     # app.run(port=5000,debug=True)
     app.run(host='0.0.0.0',port=5000,debug=True)
