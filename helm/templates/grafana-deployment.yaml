@@ -1,0 +1,50 @@
+{{- if .Values.monitoring.grafana.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "flask-app.grafanaDeploymentName" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: grafana
+    {{- include "flask-app.customLabels" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: grafana
+  template:
+    metadata:
+      labels:
+        app: grafana
+        {{- include "flask-app.customLabels" . | nindent 8 }}
+    spec:
+      containers:
+      - name: grafana
+        image: {{ .Values.monitoring.grafana.image }}
+        ports:
+        - containerPort: {{ .Values.monitoring.grafana.port }}
+        resources:
+          {{- toYaml .Values.monitoring.grafana.resources | nindent 12 }}
+        env:
+        - name: GF_SECURITY_ADMIN_PASSWORD
+          value: {{ .Values.monitoring.grafana.adminPassword }}
+        - name: GF_INSTALL_PLUGINS
+          value: "grafana-piechart-panel"
+        volumeMounts:
+        - name: grafana-dashboards
+          mountPath: /var/lib/grafana/dashboards
+        - name: grafana-datasources
+          mountPath: /etc/grafana/provisioning/datasources
+        - name: grafana-dashboard-providers
+          mountPath: /etc/grafana/provisioning/dashboards
+      volumes:
+      - name: grafana-dashboards
+        configMap:
+          name: {{ include "flask-app.grafanaDashboardConfigName" . }}
+      - name: grafana-datasources
+        configMap:
+          name: {{ include "flask-app.grafanaDatasourceConfigName" . }}
+      - name: grafana-dashboard-providers
+        configMap:
+          name: {{ include "flask-app.grafanaDashboardProviderConfigName" . }}
+{{- end }}

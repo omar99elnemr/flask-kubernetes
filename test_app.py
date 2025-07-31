@@ -27,3 +27,10 @@ def test_delete_task(client):
     assert response.status_code == 200
     assert task_id_to_delete not in tasks
 
+def test_metrics_endpoint(client):
+    response = client.get('/metrics')
+    assert response.status_code == 200
+    assert b'flask_app_requests_total' in response.data
+    assert b'flask_app_request_duration_seconds' in response.data
+    assert b'flask_app_task_operations_total' in response.data
+

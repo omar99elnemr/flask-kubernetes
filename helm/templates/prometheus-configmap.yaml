@@ -1,0 +1,26 @@
+{{- if .Values.monitoring.prometheus.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flask-app.prometheusConfigName" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: prometheus
+    {{- include "flask-app.customLabels" . | nindent 4 }}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: {{ .Values.monitoring.prometheus.scrapeInterval }}
+      evaluation_interval: {{ .Values.monitoring.prometheus.scrapeInterval }}
+    
+    scrape_configs:
+      - job_name: 'flask-app'
+        static_configs:
+          - targets: ['{{ include "flask-app.serviceName" . }}:{{ .Values.service.port }}']
+        metrics_path: '/metrics'
+        scrape_interval: {{ .Values.monitoring.prometheus.scrapeInterval }}
+        
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:{{ .Values.monitoring.prometheus.port }}']
+{{- end }}

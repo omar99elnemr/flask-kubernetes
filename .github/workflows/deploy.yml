@@ -72,6 +72,16 @@ jobs:
               --set image.repository=${{ vars.ACR_LOGIN_SERVER }}/omar-elnemr-flask-app \
               --set image.tag=${{ github.sha }} \
               --wait
+
+    - name: Deploy Monitoring Stack (Prometheus and Grafana)
+      run: |
+            kubectl apply -f ./k8s/prometheus.yaml
+            kubectl apply -f ./k8s/grafana.yaml
+            
+    - name: Wait for Monitoring Stack to be Ready
+      run: |
+            kubectl wait --for=condition=available --timeout=300s deployment/prometheus-deployment -n omar-elnemr-helm-ns
+            kubectl wait --for=condition=available --timeout=300s deployment/grafana-deployment -n omar-elnemr-helm-ns
               
     - name: Show Kubernetes resources
       run: |       
@@ -81,3 +91,13 @@ jobs:
             echo "-----------------------------------------"
             kubectl get services -n omar-elnemr-helm-ns
             echo "-----------------------------------------"
+            kubectl get configmaps -n omar-elnemr-helm-ns
+            echo "-----------------------------------------"
+            
+    - name: Verify Monitoring Stack
+      run: |
+            echo "Checking Prometheus health..."
+            kubectl exec -n omar-elnemr-helm-ns deployment/prometheus-deployment -- wget -qO- http://localhost:9090/-/healthy || echo "Prometheus health check failed"
+            echo "Checking Grafana health..."
+            kubectl exec -n omar-elnemr-helm-ns deployment/grafana-deployment -- wget -qO- http://localhost:3000/api/health || echo "Grafana health check failed"
+            echo "Monitoring stack verification completed"

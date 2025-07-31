@@ -1,0 +1,22 @@
+{{- if .Values.monitoring.grafana.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "flask-app.grafanaDashboardProviderConfigName" . }}
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: grafana
+    {{- include "flask-app.customLabels" . | nindent 4 }}
+data:
+  dashboards.yml: |
+    apiVersion: 1
+    providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        updateIntervalSeconds: 10
+        options:
+          path: /var/lib/grafana/dashboards
+{{- end }}

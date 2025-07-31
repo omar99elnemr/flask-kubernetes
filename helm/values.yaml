@@ -26,3 +26,31 @@ resources:
 labels:
   place: iti
   name: omar-elnemr
+
+# Monitoring configuration
+monitoring:
+  enabled: true
+  prometheus:
+    enabled: true
+    image: prom/prometheus:v2.47.0
+    port: 9090
+    scrapeInterval: 15s
+    resources:
+      limits:
+        memory: "512Mi"
+        cpu: "500m"
+      requests:
+        memory: "256Mi"
+        cpu: "250m"
+  grafana:
+    enabled: true
+    image: grafana/grafana:10.2.0
+    port: 3000
+    adminPassword: admin123
+    resources:
+      limits:
+        memory: "256Mi"
+        cpu: "200m"
+      requests:
+        memory: "128Mi"
+        cpu: "100m"
