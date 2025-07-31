@@ -1,83 +1,310 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Todo App</title>
+    <title>Omar's Helm Task Manager ⚓</title>
     <style>
-      body {
-        font-family: Arial, sans-serif;
-        background-color: #f4f4f4;
+      * {
         margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
         padding: 20px;
         color: #333;
       }
-      h1 {
-        color: #333;
+      
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
       }
-      form {
+      
+      .header {
+        text-align: center;
+        margin-bottom: 40px;
+      }
+      
+      .app-title {
+        font-size: 2.5em;
+        font-weight: 700;
+        color: #667eea;
+        margin-bottom: 10px;
+      }
+      
+      .creator-info {
+        color: #666;
+        font-size: 1.1em;
+        margin-bottom: 15px;
+      }
+      
+      .deployment-info {
+        background: linear-gradient(135deg, #326ce5, #1e3a8a);
+        color: white;
+        padding: 15px;
+        border-radius: 15px;
+        margin-bottom: 20px;
+        font-size: 0.9em;
+      }
+      
+      .deployment-info h3 {
+        margin-bottom: 10px;
+        font-size: 1.1em;
+      }
+      
+      .info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 10px;
+        margin-top: 10px;
+      }
+      
+      .info-item {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 0.85em;
+      }
+      
+      .add-task-section {
+        background: #f8fafc;
+        padding: 30px;
+        border-radius: 15px;
+        margin-bottom: 30px;
+        border: 2px solid #e2e8f0;
+      }
+      
+      .section-title {
+        font-size: 1.4em;
+        font-weight: 600;
+        color: #2d3748;
         margin-bottom: 20px;
       }
-      input[type="text"],
-      textarea {
-        padding: 10px;
-        margin: 10px 0;
-        width: 300px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+      
+      .task-form {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
       }
-      input[type="submit"] {
-        background-color: #4caf50;
+      
+      input[type="text"] {
+        flex: 1;
+        min-width: 250px;
+        padding: 15px 20px;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1.1em;
+        transition: all 0.3s ease;
+        background: white;
+      }
+      
+      input[type="text"]:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+      
+      .btn-primary {
+        background: linear-gradient(135deg, #4CAF50, #45a049);
         color: white;
-        padding: 10px 15px;
+        padding: 15px 30px;
         border: none;
-        border-radius: 4px;
+        border-radius: 12px;
         cursor: pointer;
+        font-size: 1.1em;
+        font-weight: 600;
+        transition: all 0.3s ease;
       }
-      input[type="submit"]:hover {
-        background-color: #45a049;
+      
+      .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
       }
-      ul {
+      
+      .btn-danger {
+        background: linear-gradient(135deg, #ff4757, #ff3742);
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 0.9em;
+        font-weight: 500;
+        transition: all 0.3s ease;
+      }
+      
+      .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(255, 71, 87, 0.4);
+      }
+      
+      .tasks-section {
+        background: #ffffff;
+        padding: 30px;
+        border-radius: 15px;
+        border: 2px solid #e2e8f0;
+      }
+      
+      .tasks-list {
         list-style-type: none;
-        padding: 0;
       }
-      li {
-        background-color: #fff;
-        margin-bottom: 8px;
-        padding: 12px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-      }
+      
       .task-item {
+        background: linear-gradient(135deg, #f8fafc, #ffffff);
+        margin-bottom: 15px;
+        padding: 20px;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
         display: flex;
         justify-content: space-between;
         align-items: center;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
       }
+      
+      .task-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        border-color: #667eea;
+      }
+      
       .task-text {
-        margin: 0;
+        font-size: 1.1em;
+        color: #2d3748;
+        font-weight: 500;
+        flex: 1;
+      }
+      
+      .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #718096;
+      }
+      
+      .footer {
+        text-align: center;
+        margin-top: 40px;
+        padding-top: 20px;
+        border-top: 2px solid #e2e8f0;
+        color: #718096;
+      }
+      
+      .tech-stack {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 15px;
+        flex-wrap: wrap;
+      }
+      
+      .tech-badge {
+        background: #f1f5f9;
+        color: #475569;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 500;
+      }
+      
+      @media (max-width: 768px) {
+        .container {
+          padding: 20px;
+          margin: 10px;
+        }
+        
+        .app-title {
+          font-size: 2em;
+        }
+        
+        .task-form {
+          flex-direction: column;
+        }
+        
+        input[type="text"] {
+          min-width: 100%;
+        }
+        
+        .info-grid {
+          grid-template-columns: 1fr;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>Todo App: v2</h1>
+    <div class="container">
+      <div class="header">
+        <h1 class="app-title">⚓ Task Manager Pro</h1>
+        <div class="creator-info">
+          <strong>Implemented by Omar ElNemr</strong>
+        </div>
+        
+        <div class="deployment-info">
+          <h3>🚀 Deployment Information</h3>
+          <div class="info-grid">
+            <div class="info-item">📦 Deployed using Helm Charts</div>
+            <div class="info-item">☸️ Running on Kubernetes</div>
+            <div class="info-item">🐳 Containerized with Docker</div>
+            <div class="info-item">☁️ Hosted on Azure AKS</div>
+          </div>
+        </div>
+      </div>
 
-    <!-- Add Task Form -->
-    <form method="post">
-      <input type="text" name="task_content" placeholder="Enter a new task" />
-      <input type="submit" name="add_task" value="Add Task" />
-    </form>
-
-    <!-- Display Tasks -->
-    <h2>Tasks: sdfasdf</h2>
-    <ul>
-      {% for id, task in tasks.items() %}
-      <li class="task-item">
-        <p class="task-text">{{ task }}</p>
-        <!-- Delete Button for Each Task -->
-        <form method="post" style="display: inline">
-          <input type="hidden" name="task_id_to_delete" value="{{ id }}" />
-          <input type="submit" name="delete_task" value="Delete" />
+      <div class="add-task-section">
+        <h2 class="section-title">➕ Add New Task</h2>
+        <form method="post" class="task-form">
+          <input type="text" name="task_content" placeholder="What needs to be done? ✨" required />
+          <button type="submit" name="add_task" class="btn-primary">Add Task</button>
         </form>
-      </li>
-      {% endfor %}
-    </ul>
+      </div>
+
+      <div class="tasks-section">
+        <h2 class="section-title">
+          📋 My Tasks 
+          {% if tasks %}
+            <span style="background: #e2e8f0; color: #4a5568; padding: 4px 12px; border-radius: 20px; font-size: 0.8em;">{{ tasks|length }}</span>
+          {% endif %}
+        </h2>
+        
+        {% if tasks %}
+          <ul class="tasks-list">
+            {% for id, task in tasks.items() %}
+            <li class="task-item">
+              <div class="task-text">
+                ✅ {{ task }}
+              </div>
+              <form method="post" style="display: inline">
+                <input type="hidden" name="task_id_to_delete" value="{{ id }}" />
+                <button type="submit" name="delete_task" class="btn-danger">🗑️ Delete</button>
+              </form>
+            </li>
+            {% endfor %}
+          </ul>
+        {% else %}
+          <div class="empty-state">
+            <h3>📝 No tasks yet!</h3>
+            <p>Add your first task above to get started with your productivity journey.</p>
+          </div>
+        {% endif %}
+      </div>
+
+      <div class="footer">
+        <p><strong>Built with ❤️ by Omar ElNemr</strong></p>
+        <p style="margin-top: 5px; font-size: 0.9em;">Kubernetes & Helm Deployment Demo Project</p>
+        <div class="tech-stack">
+          <span class="tech-badge">🐍 Flask</span>
+          <span class="tech-badge">🐳 Docker</span>
+          <span class="tech-badge">⚓ Helm</span>
+          <span class="tech-badge">☸️ Kubernetes</span>
+          <span class="tech-badge">☁️ Azure</span>
+        </div>
+      </div>
+    </div>
   </body>
 </html>
