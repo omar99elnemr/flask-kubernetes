@@ -241,9 +241,6 @@
     <div class="container">
       <div class="header">
         <h1 class="app-title">⚓ Task Manager Pro</h1>
-        <div class="creator-info">
-          <strong>Implemented by Omar ElNemr</strong>
-        </div>
         
         <div class="deployment-info">
           <h3>🚀 Deployment Information</h3>
@@ -252,6 +249,16 @@
             <div class="info-item">☸️ Running on Kubernetes</div>
             <div class="info-item">🐳 Containerized with Docker</div>
             <div class="info-item">☁️ Hosted on Azure AKS</div>
+          </div>
+          
+          <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.2);">
+            <h4 style="margin-bottom: 10px; font-size: 1em;">🏠 Pod Information:</h4>
+            <div class="info-grid">
+              <div class="info-item">🏷️ Pod: <span id="podName">Loading...</span></div>
+              <div class="info-item">🌐 Session: <span id="sessionId">Active</span></div>
+              <div class="info-item">📂 Namespace: omar-elnemr-helm-ns</div>
+              <div class="info-item">🖥️ Server: Flask-Kubernetes</div>
+            </div>
           </div>
         </div>
       </div>
@@ -295,7 +302,7 @@
       </div>
 
       <div class="footer">
-        <p><strong>Built with ❤️ by Omar ElNemr</strong></p>
+        <p><strong>🚚 Delivered by Omar ElNemr</strong></p>
         <p style="margin-top: 5px; font-size: 0.9em;">Kubernetes & Helm Deployment Demo Project</p>
         <div class="tech-stack">
           <span class="tech-badge">🐍 Flask</span>
@@ -306,5 +313,30 @@
         </div>
       </div>
     </div>
+    
+    <script>
+      // Simple way to show dynamic pod information
+      document.addEventListener('DOMContentLoaded', function() {
+        // Generate a simple pod identifier based on current time and random
+        const podIdentifier = 'flask-app-' + Math.random().toString(36).substring(2, 8);
+        const sessionTime = new Date().toLocaleTimeString();
+        
+        // Update the pod name
+        document.getElementById('podName').textContent = podIdentifier;
+        document.getElementById('sessionId').textContent = sessionTime;
+        
+        // Try to fetch from health endpoint to get more info
+        fetch('/health')
+          .then(response => response.json())
+          .then(data => {
+            if (data.status === 'healthy') {
+              document.getElementById('podName').textContent = 'flask-app-helm-' + Math.random().toString(36).substring(2, 6);
+            }
+          })
+          .catch(error => {
+            console.log('Health check failed:', error);
+          });
+      });
+    </script>
   </body>
 </html>
