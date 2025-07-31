@@ -1,0 +1,28 @@
+# Default values for flask-app.
+
+namespace: omar-elnemr-helm-ns
+
+replicaCount: 3
+
+image:
+  repository: your-acr.azurecr.io/flask-app
+  tag: latest
+  pullPolicy: IfNotPresent
+
+service:
+  type: LoadBalancer
+  port: 5000
+  targetPort: 5000
+
+resources:
+  limits:
+    memory: "128Mi"
+    cpu: "100m"
+  requests:
+    memory: "64Mi"
+    cpu: "50m"
+
+# Custom labels as specified
+labels:
+  place: iti
+  name: omar-elnemr
