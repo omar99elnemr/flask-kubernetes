@@ -103,23 +103,9 @@ jobs:
       run: |
         kubectl create namespace flask-app-ns --dry-run=client -o yaml | kubectl apply -f -
 
-    - name: Clean up any stuck Helm operations
-      run: |
-        echo "=== Checking Helm status ==="
-        helm list -n flask-app-ns || echo "No releases found"
-        
-        # Check for stuck operations and clean up
-        helm status flask-app -n flask-app-ns || echo "No existing release"
-        
-        # Force cleanup if needed
-        helm uninstall flask-app -n flask-app-ns --wait || echo "No release to uninstall"
-        
-        echo "=== Waiting for cleanup ==="
-        sleep 30
-
     - name: Deploy with Helm 
       run: |
-        helm install flask-app ./helm \
+        helm upgrade --install flask-app ./helm \
           --namespace flask-app-ns \
           --set image.repository=${{ vars.ACR_LOGIN_SERVER }}/omar-elnemr-flask-app \
           --set image.tag=${{ github.sha }} \
