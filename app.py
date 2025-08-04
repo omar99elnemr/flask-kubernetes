@@ -27,7 +27,16 @@ def index():
 
 @app.route('/health')
 def health_check():
-    return {'status': 'healthy', 'message': 'Omar ElNemr Flask App is running!'}, 200
+    return {'status': 'healthy', 'message': 'Omar ElNemr Flask App is running!', 'active_tasks': len(tasks)}, 200
+
+@app.route('/metrics')
+def metrics():
+    """Basic metrics endpoint for monitoring"""
+    return {
+        'active_tasks': len(tasks),
+        'total_tasks_created': task_id_counter - 1,
+        'status': 'healthy'
+    }, 200
 
 if __name__ == '__main__':
     # app.run(port=5000,debug=True)

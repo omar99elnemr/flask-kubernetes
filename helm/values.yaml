@@ -2,7 +2,7 @@
 
 namespace: flask-app-ns
 
-replicaCount: 2
+replicaCount: 1  # Reduced for faster deployment
 
 image:
   repository: acr.azurecr.io/flask-app
@@ -11,7 +11,7 @@ image:
 
 service:
   type: LoadBalancer
-  port: 5000  # External port exposed by the service
+  port: 80  # Changed to standard HTTP port
   targetPort: 5000  # Internal container port remains 5000
   name: flask-app-service  # Explicit service name
 
@@ -34,8 +34,8 @@ monitoring:
 
 resources:
   limits:
-    memory: "256Mi"  # Increased for prometheus-client
-    cpu: "200m"
-  requests:
-    memory: "128Mi"
+    memory: "128Mi"  # Reduced for faster startup
     cpu: "100m"
+  requests:
+    memory: "64Mi"
+    cpu: "50m"
