@@ -1,19 +1,14 @@
-name: helm-workflow
-
+name: flask-app-aks-deployment-with-monitoring
 
 on:
   workflow_dispatch:
-#   push:
-#     branches:
-#       - main
-
+  # push:
+  #   branches:
+  #     - main
 
 jobs:
-#   unit-testing: … 
-#   code-coverage: … 
-#   docker: 
   docker-build:
-    name: docker build
+    name: Build and Push Docker Image
     runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
@@ -25,14 +20,16 @@ jobs:
         login-server: ${{ vars.ACR_LOGIN_SERVER }}
         username: ${{ vars.ACR_USERNAME }}
         password: ${{ secrets.ACR_PASSWORD }}
+
     - name: Build and Push Docker Image to ACR
       uses: docker/build-push-action@v4
       with:
         context: .
         push: true
         tags: ${{ vars.ACR_LOGIN_SERVER }}/omar-elnemr-flask-app:${{ github.sha }}
-  helm-deploy:
-    name: Deploy with Helm
+
+  setup-monitoring:
+    name: Setup Prometheus and Grafana
     runs-on: ubuntu-latest
     needs: docker-build
     steps:
@@ -47,7 +44,7 @@ jobs:
     - name: Install kubectl CLI
       uses: azure/setup-kubectl@v4.0.1
       with:
-            version: 'latest'
+        version: 'latest'
 
     - name: Set Kubeconfig Context
       uses: azure/k8s-set-context@v4.0.1
@@ -55,29 +52,96 @@ jobs:
         method: kubeconfig
         kubeconfig: ${{ secrets.KUBECONFIG }}
 
-    - name: Fetch Kubernetes Cluster Details
+    - name: Add Prometheus Helm Repository
       run: |
-            kubectl version
-            echo "-----------------------------------------"
-            kubectl get nodes
+        helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+        helm repo update
+
+    - name: Create monitoring namespace
+      run: |
+        kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
+
+    - name: Install Prometheus Stack using Script
+      run: |
+        chmod +x scripts/install-prometheus.sh
+        ./scripts/install-prometheus.sh
+
+    - name: Deploy ServiceMonitor from File
+      run: |
+        kubectl apply -f k8s/servicemonitor.yaml
+        echo "ServiceMonitor deployed from file"
+        
+        # Verify deployment
+        kubectl get servicemonitor -n monitoring
+        kubectl describe servicemonitor flask-app-servicemonitor -n monitoring
+
+  helm-deploy:
+    name: Deploy Flask App with Helm
+    runs-on: ubuntu-latest
+    needs: [docker-build, setup-monitoring]
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4.2.2
+
+    - name: Install Helm
+      uses: azure/setup-helm@v3
+      with:
+        version: '3.12.0'
+
+    - name: Install kubectl CLI
+      uses: azure/setup-kubectl@v4.0.1
+      with:
+        version: 'latest'
+
+    - name: Set Kubeconfig Context
+      uses: azure/k8s-set-context@v4.0.1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
 
     - name: Create namespace if not exists
       run: |
-            kubectl create namespace omar-elnemr-helm-ns --dry-run=client -o yaml | kubectl apply -f -
+        kubectl create namespace flask-app-ns --dry-run=client -o yaml | kubectl apply -f -
 
     - name: Deploy with Helm
       run: |
-            helm upgrade --install flask-app ./helm \
-              --namespace omar-elnemr-helm-ns \
-              --set image.repository=${{ vars.ACR_LOGIN_SERVER }}/omar-elnemr-flask-app \
-              --set image.tag=${{ github.sha }} \
-              --wait
-              
-    - name: Show Kubernetes resources
-      run: |       
-            kubectl get deployments -n omar-elnemr-helm-ns
-            echo "-----------------------------------------"
-            kubectl get pods -n omar-elnemr-helm-ns
-            echo "-----------------------------------------"
-            kubectl get services -n omar-elnemr-helm-ns
-            echo "-----------------------------------------"
+        helm upgrade --install flask-app ./helm \
+          --namespace flask-app-ns \
+          --set image.repository=${{ vars.ACR_LOGIN_SERVER }}/omar-elnemr-flask-app \
+          --set image.tag=${{ github.sha }} \
+          --wait
+
+  show-access-urls:
+    name: Show Access URLs
+    runs-on: ubuntu-latest
+    needs: [setup-monitoring, helm-deploy]
+    steps:
+    - name: Install kubectl CLI
+      uses: azure/setup-kubectl@v4.0.1
+      with:
+        version: 'latest'
+
+    - name: Set Kubeconfig Context
+      uses: azure/k8s-set-context@v4.0.1
+      with:
+        method: kubeconfig
+        kubeconfig: ${{ secrets.KUBECONFIG }}
+
+    - name: Display Access URLs
+      run: |
+        echo "Waiting for LoadBalancer IPs to be assigned..."
+        sleep 90
+        
+        echo "========================================"
+        echo "🚀 KUBERNETES SERVICES STATUS"
+        echo "========================================"
+        
+        echo "📱 Flask Application Services:"
+        kubectl get services -n omar-elnemr-helm-ns -o wide
+        echo ""
+        
+        echo "📊 Monitoring Services:"
+        kubectl get services -n monitoring -o wide | grep -E "(NAME|prometheus|grafana)"
+        echo ""
+        echo "========================================"
+        

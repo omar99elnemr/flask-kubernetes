@@ -1,14 +1,23 @@
 apiVersion: v1
 kind: Service
 metadata:
-  name: {{ include "flask-app.serviceName" . }}
+  name: {{ .Values.service.name }}
   namespace: {{ .Values.namespace }}
   labels:
-    {{- include "flask-app.customLabels" . | nindent 4 }}
+    place: {{ .Values.labels.place }}
+    name: {{ .Values.labels.name }}
+    app: flask-app
+    {{- if .Values.monitoring.enabled }}
+    # ServiceMonitor discovery labels
+    app.kubernetes.io/name: {{ .Values.monitoring.labels."app.kubernetes.io/name" }}
+    monitoring: {{ .Values.monitoring.labels.monitoring | quote }}
+    {{- end }}
 spec:
   type: {{ .Values.service.type }}
   selector:
     app: flask-app
   ports:
-  - port: {{ .Values.service.port }}
+  - name: {{ .Values.monitoring.port.name }}  # Named port: web-port
+    port: {{ .Values.service.port }}
     targetPort: {{ .Values.service.targetPort }}
+    protocol: TCP

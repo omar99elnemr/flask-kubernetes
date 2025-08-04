@@ -2,7 +2,7 @@
 
 namespace: omar-elnemr-helm-ns
 
-replicaCount: 3
+replicaCount: 2
 
 image:
   repository: acr.azurecr.io/flask-app
@@ -11,18 +11,31 @@ image:
 
 service:
   type: LoadBalancer
-  port: 5000
-  targetPort: 5000
+  port: 5000  # External port exposed by the service
+  targetPort: 5000  # Internal container port remains 5000
+  name: flask-app-service  # Explicit service name
 
-resources:
-  limits:
-    memory: "128Mi"
-    cpu: "100m"
-  requests:
-    memory: "64Mi"
-    cpu: "50m"
+deployment:
+  name: flask-app-deployment  # Explicit deployment name
 
 # Custom labels as specified
 labels:
   place: iti
   name: omar-elnemr
+
+# Monitoring configuration for ServiceMonitor
+monitoring:
+  enabled: true
+  labels:
+    app.kubernetes.io/name: flask-app
+    monitoring: "true"
+  port:
+    name: web-port  # Named port for ServiceMonitor
+
+resources:
+  limits:
+    memory: "256Mi"  # Increased for prometheus-client
+    cpu: "200m"
+  requests:
+    memory: "128Mi"
+    cpu: "100m"

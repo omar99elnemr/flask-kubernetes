@@ -1,10 +1,12 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "flask-app.deploymentName" . }}
+  name: {{ .Values.deployment.name }}
   namespace: {{ .Values.namespace }}
   labels:
-    {{- include "flask-app.customLabels" . | nindent 4 }}
+    place: {{ .Values.labels.place }}
+    name: {{ .Values.labels.name }}
+    app: flask-app
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
@@ -14,12 +16,28 @@ spec:
     metadata:
       labels:
         app: flask-app
-        {{- include "flask-app.customLabels" . | nindent 8 }}
+        place: {{ .Values.labels.place }}
+        name: {{ .Values.labels.name }}
     spec:
       containers:
       - name: flask-app
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
         resources:
           {{- toYaml .Values.resources | nindent 12 }}
         ports:
-        - containerPort: {{ .Values.service.targetPort }}
+        - name: {{ .Values.monitoring.port.name }}
+          containerPort: {{ .Values.service.targetPort }}
+          protocol: TCP
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: {{ .Values.service.targetPort }}
+          initialDelaySeconds: 5
+          periodSeconds: 5
