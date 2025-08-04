@@ -137,7 +137,7 @@ jobs:
         echo "========================================"
         
         echo "📱 Flask Application Services:"
-        kubectl get services -n omar-elnemr-helm-ns -o wide
+        kubectl get services -n flask-app-ns -o wide
         echo ""
         
         echo "📊 Monitoring Services:"

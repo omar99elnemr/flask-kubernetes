@@ -1,6 +1,6 @@
 # Default values for flask-app.
 
-namespace: omar-elnemr-helm-ns
+namespace: flask-app-ns
 
 replicaCount: 2
 
