@@ -2,9 +2,9 @@ name: flask-app-aks-deployment-with-monitoring
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - main
 
 jobs:
   docker-build:
