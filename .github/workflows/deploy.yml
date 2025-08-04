@@ -109,8 +109,19 @@ jobs:
           --namespace flask-app-ns \
           --set image.repository=${{ vars.ACR_LOGIN_SERVER }}/omar-elnemr-flask-app \
           --set image.tag=${{ github.sha }} \
+          --timeout=10m \
           --wait \
           --debug
+
+    - name: Debug pod failures if any
+      if: failure()
+      run: |
+        echo "=== Pod Logs ==="
+        kubectl logs -l app=flask-app -n flask-app-ns --tail=50 || echo "No logs available"
+        echo "=== Pod Events ==="
+        kubectl get events -n flask-app-ns --sort-by='.lastTimestamp' | tail -20
+        echo "=== Pod Describe ==="
+        kubectl describe pods -l app=flask-app -n flask-app-ns || echo "No pods found"
 
     - name: Check deployment status after Helm
       run: |
