@@ -10,9 +10,10 @@ image:
   pullPolicy: IfNotPresent
 
 service:
-  type: LoadBalancer
+  type: NodePort
   port: 80  # Changed to standard HTTP port
   targetPort: 5000  # Internal container port remains 5000
+  nodePort: 30080  # Fixed NodePort for external access
   name: flask-app-service  # Explicit service name
 
 deployment:

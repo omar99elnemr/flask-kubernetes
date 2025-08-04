@@ -109,8 +109,7 @@ jobs:
           --namespace flask-app-ns \
           --set image.repository=${{ vars.ACR_LOGIN_SERVER }}/omar-elnemr-flask-app \
           --set image.tag=${{ github.sha }} \
-          --timeout=10m \
-          --wait \
+          --timeout=5m \
           --debug
 
   show-access-urls:
@@ -131,9 +130,6 @@ jobs:
 
     - name: Display Access URLs
       run: |
-        echo "Waiting for LoadBalancer IPs to be assigned..."
-        sleep 90
-        
         echo "========================================"
         echo "🚀 KUBERNETES SERVICES STATUS"
         echo "========================================"
@@ -144,6 +140,14 @@ jobs:
         
         echo "📊 Monitoring Services:"
         kubectl get services -n monitoring -o wide | grep -E "(NAME|prometheus|grafana)"
+        echo ""
+        
+        echo "🌐 Access Information:"
+        echo "Flask App: Access via NodePort 30080 on any cluster node"
+        echo "Example: http://<node-ip>:30080"
+        echo ""
+        echo "To get node IPs:"
+        kubectl get nodes -o wide
         echo ""
         echo "========================================"
         
