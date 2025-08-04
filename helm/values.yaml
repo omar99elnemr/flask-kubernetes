@@ -11,7 +11,7 @@ image:
 
 service:
   type: LoadBalancer
-  port: 5000  # Changed to standard HTTP port
+  port: 80  # Changed to standard HTTP port
   targetPort: 5000  # Internal container port remains 5000
   name: flask-app-service  # Explicit service name
 
