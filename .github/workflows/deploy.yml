@@ -103,22 +103,12 @@ jobs:
       run: |
         kubectl create namespace flask-app-ns --dry-run=client -o yaml | kubectl apply -f -
 
-    - name: Debug cluster state before deployment
-      run: |
-        echo "=== Cluster Nodes ==="
-        kubectl get nodes
-        echo "=== Available Resources ==="
-        kubectl top nodes || echo "Metrics not available"
-        echo "=== Existing Pods in flask-app-ns ==="
-        kubectl get pods -n flask-app-ns || echo "No pods found"
-
-    - name: Deploy with Helm (with extended timeout)
+    - name: Deploy with Helm 
       run: |
         helm upgrade --install flask-app ./helm \
           --namespace flask-app-ns \
           --set image.repository=${{ vars.ACR_LOGIN_SERVER }}/omar-elnemr-flask-app \
           --set image.tag=${{ github.sha }} \
-          --timeout=10m \
           --wait \
           --debug
 
