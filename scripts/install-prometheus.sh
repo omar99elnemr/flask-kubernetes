@@ -9,7 +9,7 @@ helm upgrade --install kube-prometheus-stack prometheus-community/kube-prometheu
   --set prometheus.prometheusSpec.scrapeInterval=30s \
   --set prometheus.prometheusSpec.evaluationInterval=30s \
   --set alertmanager.enabled=false \
-  --wait --timeout=10m
+  --wait
 
 echo "Prometheus Stack installation completed successfully!"
 
