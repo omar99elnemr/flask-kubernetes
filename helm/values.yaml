@@ -2,7 +2,7 @@
 
 namespace: flask-app-ns
 
-replicaCount: 1  # Reduced for faster deployment
+replicaCount: 2  # Reduced for faster deployment
 
 image:
   repository: acr.azurecr.io/flask-app
