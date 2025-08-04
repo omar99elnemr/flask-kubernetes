@@ -9,7 +9,7 @@ metadata:
     app: flask-app
     {{- if .Values.monitoring.enabled }}
     # ServiceMonitor discovery labels
-    app.kubernetes.io/name: {{ .Values.monitoring.labels."app.kubernetes.io/name" }}
+    app.kubernetes.io/name: {{ index .Values.monitoring.labels "app.kubernetes.io/name" }}
     monitoring: {{ .Values.monitoring.labels.monitoring | quote }}
     {{- end }}
 spec:
