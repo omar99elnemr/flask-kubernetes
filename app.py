@@ -9,7 +9,8 @@ task_id_counter = 1
 @app.route('/', methods=['GET', 'POST'])
 def index():
     global task_id_counter
-    
+    response_text = ""
+
     if request.method == 'POST':
         if 'add_task' in request.form:
             task_content = request.form.get('task_content')
@@ -19,23 +20,15 @@ def index():
 
         elif 'delete_task' in request.form:
             task_id_to_delete = int(request.form.get('task_id_to_delete'))
-            if task_id_to_delete in tasks:
-                tasks.pop(task_id_to_delete, None)
+            tasks.pop(task_id_to_delete, None)
 
+        
     return render_template('index.html', tasks=tasks)
 
 @app.route('/health')
 def health_check():
-    return {'status': 'healthy', 'message': 'Omar ElNemr Flask App is running!', 'active_tasks': len(tasks)}, 200
-
-@app.route('/metrics')
-def metrics():
-    """Basic metrics endpoint for health checking"""
-    return {
-        'active_tasks': len(tasks),
-        'total_tasks_created': task_id_counter - 1,
-        'status': 'healthy'
-    }, 200
+    return {'status': 'healthy', 'message': 'Omar ElNemr Flask App is running!'}, 200
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # app.run(port=5000,debug=True)
+    app.run(host='0.0.0.0',port=5000,debug=True)
