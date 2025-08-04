@@ -113,25 +113,6 @@ jobs:
           --wait \
           --debug
 
-    - name: Debug pod failures if any
-      if: failure()
-      run: |
-        echo "=== Pod Logs ==="
-        kubectl logs -l app=flask-app -n flask-app-ns --tail=50 || echo "No logs available"
-        echo "=== Pod Events ==="
-        kubectl get events -n flask-app-ns --sort-by='.lastTimestamp' | tail -20
-        echo "=== Pod Describe ==="
-        kubectl describe pods -l app=flask-app -n flask-app-ns || echo "No pods found"
-
-    - name: Check deployment status after Helm
-      run: |
-        echo "=== Deployment Status ==="
-        kubectl get deployments -n flask-app-ns
-        echo "=== Pod Status ==="
-        kubectl get pods -n flask-app-ns
-        echo "=== Recent Events ==="
-        kubectl get events -n flask-app-ns --sort-by='.lastTimestamp' | tail -10
-
   show-access-urls:
     name: Show Access URLs
     runs-on: ubuntu-latest
